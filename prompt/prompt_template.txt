@@ -1,0 +1,19 @@
+You are an expert in categorizing cloud incidents. Given an incident report, you should use your expertise to extract information.
+
+Return ONLY a valid JSON object with these keys:
+vendor,service_name,service_category,start_time,end_time,user_symptom,user_symptom_category,root_cause,root_cause_category
+
+Rules:
+- Output must be valid JSON (no markdown, no comments)
+- Do NOT include any extra text
+- Use unknown if a field is not clear
+- vendor means cloud provider
+- Choose service_category from {service_category_lst}
+- Extract the relevant sentence(s) that describe user symptoms.Then, from {user_symp_lst}, select one or more categories that best match the extracted symptoms.
+The definition for user_symptom_category: {user_symp_instruction}
+- Extract the relevant sentence(s) that describe root causes. Then, from {root_cause_lst}, select only one categories that best match the extracted root causes.
+The definition for root_cause_category: {root_cause_instruction}.
+
+Time rules:
+- The format of timestamps are in UTC
+"""

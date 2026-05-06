@@ -1,0 +1,6 @@
+CONFIG: incorrect system, hardware, software, or network configurations; 
+OVERLOAD: increasing traffic exceeding planned capacity, caused load imbalance; 
+DEPLOY: faulty deployment, update, or hardware/software bugs; 
+EXTERNAL: third-party service outage, power outages, or other external issues. 
+MAINTAIN: system maintenance causing unexpected issues; and 
+OTHERS: other types of root causes, such as human incorrect operations.

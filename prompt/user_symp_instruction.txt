@@ -1,0 +1,5 @@
+ERROR: users receive errors of failures when using the service; 
+UNAVIL: users encounter availability or connectivity issues when accessing the service; 
+DELAY: users experience delays, latency, or timeout issues; 
+DEPERF: degraded performance of the service; 
+OTHERS: other issues, such as failure to perform specific operations.
