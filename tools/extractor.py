@@ -4,8 +4,10 @@ from langchain_core.prompts import ChatPromptTemplate
 from langchain_core.output_parsers import PydanticOutputParser
 from pydantic import BaseModel
 from typing import Union
+import pandas as pd
+import os
 
-
+STORE_PATH = "cli_evaluation_log.csv"
 
 # -----------------------
 # 1. Schema
@@ -16,8 +18,8 @@ class Metadata(BaseModel):
    service_category: str
    start_time: str
    end_time: str
-   user_symptom: str   
-   user_symptom_category:  Union[str, list[str]] 
+   user_symptom: str
+   user_symptom_category: Union[str, list[str]]
    root_cause: str
    root_cause_category: str
 
@@ -31,7 +33,7 @@ chat = ChatOpenAI(model="gpt-4o-mini", temperature=0)
 
 
 # -----------------------
-# 3. Prompt template (IMPORTANT FIX)
+# 3. Prompt template
 # -----------------------
 def generate_prompt() -> str:
     service_category_lst = ['COMPUTE', 'STORAGE', 'NETWORK', 'SECURITY', 'AI', 'MANAGEMENT', 'ANALYTICS', 'DATABASE', 'OTHERS', 'UNKNOWN']
@@ -47,7 +49,6 @@ def generate_prompt() -> str:
         user_symp_instruction=user_symp_instruction,
         root_cause_instruction=root_cause_instruction
     )
-    print("Generated prompt:%s", prompt)
     return prompt
 
 prompt = generate_prompt()
@@ -64,14 +65,26 @@ chain = prompt_template | chat | parser
 
 
 # -----------------------
-# 5. Tool (REAL version)
+# 5. Tool
 # -----------------------
 @tool
 def extractor(report: str) -> dict:
     """
-    Extract data from incident report.
+    Extract structured metadata from an incident report and save it to the store.
+    Returns the extracted record as a dict.
     """
-
     result = chain.invoke({"report": report})
+    record = result.model_dump()
 
-    return result.model_dump()
+    # Normalize user_symptom_category to string for CSV storage
+    if isinstance(record.get("user_symptom_category"), list):
+        record["user_symptom_category"] = ",".join(record["user_symptom_category"])
+
+    # Append to CSV store (create with header if it doesn't exist yet)
+    df_new = pd.DataFrame([record])
+    if os.path.exists(STORE_PATH):
+        df_new.to_csv(STORE_PATH, mode="a", header=False, index=False)
+    else:
+        df_new.to_csv(STORE_PATH, mode="w", header=True, index=False)
+
+    return record
