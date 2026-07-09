@@ -6,8 +6,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
-import os
-import platform
 from typing import Optional
 import time
 from tools.data_loader import load_filtered_df
@@ -16,16 +14,6 @@ from tools.plot_logger import log_plot
 warnings.filterwarnings('ignore')
 
 SQUARE = (6, 6)
-
-
-def _open_image(path: str):
-    system = platform.system()
-    if system == "Darwin":
-        os.system(f"open -g '{path}'")
-    elif system == "Windows":
-        os.startfile(path)
-    else:
-        os.system(f"xdg-open '{path}'")
 
 
 def _compute_mttr(df: pd.DataFrame) -> pd.DataFrame:
@@ -82,7 +70,6 @@ def plot_duration_box(
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
-    _open_image(output_path)
     log_plot("plot_duration_box", vendors, years, output_path, len(df), time.time() - t0)
     return f"Plot saved to '{output_path}'. Median MTTR: {median:.2f}h | n={len(df)}"
 
@@ -128,7 +115,6 @@ def plot_duration_bar(
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
-    _open_image(output_path)
     log_plot("plot_duration_bar", vendors, years, output_path, len(df), time.time() - t0)
     return f"Plot saved to '{output_path}'. Mean MTTR by year: " + \
            ", ".join(f"{y}={v:.2f}h" for y, v in yearly.items())
@@ -177,6 +163,5 @@ def plot_duration_line(
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
-    _open_image(output_path)
     log_plot("plot_duration_line", vendors, years, output_path, len(df), time.time() - t0)
     return f"Plot saved to '{output_path}'. Trend plotted over {len(monthly)} months."

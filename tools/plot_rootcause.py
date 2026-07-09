@@ -5,8 +5,6 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import warnings
-import os
-import platform
 from typing import Optional
 import time
 from tools.data_loader import load_filtered_df, ALL_VENDORS
@@ -20,16 +18,6 @@ RECT = (12, 5)
 CATEGORIES = ['CONFIG', 'OVERLOAD', 'DEPLOY', 'EXTERNAL', 'MAINTAIN', 'OTHERS', 'UNKNOWN']
 COLORS = ['#8dd3c7', '#ffffb3', '#bebada', '#fb8072', '#80b1d3', '#fdb462', '#b3de69']
 CAT_COLOR = dict(zip(CATEGORIES, COLORS))
-
-
-def _open_image(path: str):
-    system = platform.system()
-    if system == "Darwin":
-        os.system(f"open -g '{path}'")
-    elif system == "Windows":
-        os.startfile(path)
-    else:
-        os.system(f"xdg-open '{path}'")
 
 
 def _clean(df: pd.DataFrame) -> pd.DataFrame:
@@ -78,7 +66,6 @@ def plot_rootcause_pie(
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
-    _open_image(output_path)
     log_plot("plot_rootcause_pie", vendors, years, output_path, len(df), time.time() - t0)
 
     breakdown = ", ".join(f"{c}: {counts[c]/counts.sum()*100:.1f}%" for c in counts.index)
@@ -123,7 +110,6 @@ def plot_rootcause_bar(
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
-    _open_image(output_path)
     log_plot("plot_rootcause_bar", vendors, years, output_path, len(df), time.time() - t0)
 
     breakdown = ", ".join(f"{c}: {v:.1f}%" for c, v in pct.sort_values(ascending=False).items())
@@ -182,6 +168,5 @@ def plot_rootcause_stacked(
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
-    _open_image(output_path)
     log_plot("plot_rootcause_stacked", vendors, years, output_path, len(df), time.time() - t0)
     return f"Plot saved to '{output_path}'. Vendors compared: {', '.join(vendor_list)}"

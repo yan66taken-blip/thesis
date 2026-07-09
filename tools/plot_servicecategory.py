@@ -5,8 +5,6 @@ import matplotlib
 matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import warnings
-import os
-import platform
 from typing import Optional
 import time
 from tools.data_loader import load_filtered_df
@@ -20,16 +18,6 @@ RECT = (12, 5)
 CATEGORIES = ['COMPUTE', 'STORAGE', 'NETWORK', 'SECURITY', 'AI',
               'MANAGEMENT', 'ANALYTICS', 'DATABASE', 'OTHERS', 'UNKNOWN']
 COLORS = plt.cm.tab10.colors
-
-
-def _open_image(path: str):
-    system = platform.system()
-    if system == "Darwin":
-        os.system(f"open -g '{path}'")
-    elif system == "Windows":
-        os.startfile(path)
-    else:
-        os.system(f"xdg-open '{path}'")
 
 
 def _clean(df: pd.DataFrame) -> pd.DataFrame:
@@ -79,7 +67,6 @@ def plot_servicecategory_pie(
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
-    _open_image(output_path)
     log_plot("plot_servicecategory_pie", vendors, years, output_path, len(df), time.time() - t0)
 
     breakdown = ", ".join(f"{c}: {counts[c]/counts.sum()*100:.1f}%" for c in counts.index)
@@ -125,7 +112,6 @@ def plot_servicecategory_bar(
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
-    _open_image(output_path)
     log_plot("plot_servicecategory_bar", vendors, years, output_path, len(df), time.time() - t0)
 
     breakdown = ", ".join(f"{c}: {v:.1f}%" for c, v in pct.sort_values(ascending=False).items())
@@ -188,6 +174,5 @@ def plot_servicecategory_stacked(
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
-    _open_image(output_path)
     log_plot("plot_servicecategory_stacked", vendors, years, output_path, len(df), time.time() - t0)
     return f"Plot saved to '{output_path}'. Vendors compared: {', '.join(vendor_list)}"

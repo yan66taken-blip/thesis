@@ -5,7 +5,6 @@ matplotlib.use("Agg")
 import matplotlib.pyplot as plt
 import os
 import glob
-import platform
 import time
 from typing import Optional
 from tools.plot_logger import log_plot
@@ -41,16 +40,6 @@ FIELD_TYPES = {
 VENDOR_COLORS = {"Azure": "#0078D4", "AWS": "#FF9900", "GCP": "#34A853"}
 
 
-def _open_image(path: str):
-    system = platform.system()
-    if system == "Darwin":
-        os.system(f"open -g '{path}'")
-    elif system == "Windows":
-        os.startfile(path)
-    else:
-        os.system(f"xdg-open '{path}'")
-
-
 def _filter(df: pd.DataFrame, vendors: Optional[list], years: Optional[list]) -> pd.DataFrame:
     if vendors:
         df = df[df["vendor"].str.upper().isin([v.upper() for v in vendors])]
@@ -80,7 +69,6 @@ def _save(fig, output_path: str):
     os.makedirs(os.path.dirname(output_path) or ".", exist_ok=True)
     fig.savefig(output_path, dpi=150, bbox_inches="tight")
     plt.close(fig)
-    _open_image(output_path)
 
 
 @tool
