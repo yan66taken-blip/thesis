@@ -37,3 +37,8 @@ timestamp,tool,vendors,years,output_path,record_count,time_sec
 2026-06-19T07:00:50Z,plot_eval_tokens,ALL,ALL,eval_tokens.png,460,0.129
 2026-07-08T16:37:34Z,plot_eval_latency,ALL,ALL,eval_latency.png,520,0.259
 2026-07-08T16:37:35Z,plot_eval_tokens,ALL,ALL,eval_tokens.png,520,0.179
+2026-07-09T20:15:37Z,plot_duration_box,ALL,ALL,latency_distribution_box.png,2,0.483
+2026-07-09T20:19:53Z,plot_rootcause_bar,ALL,ALL,rootcause_bar.png,553,0.236
+2026-07-09T20:20:33Z,plot_eval_latency,ALL,ALL,/tmp/_test_latency.png,460,0.207
+2026-07-09T20:20:34Z,plot_eval_tokens,ALL,ALL,/tmp/_test_tokens.png,460,0.184
+2026-07-09T22:53:57Z,plot_eval_latency,ALL,ALL,eval_latency.png,460,0.248

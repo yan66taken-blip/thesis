@@ -69,7 +69,7 @@ def _load(input_path: str, vendors: Optional[list], years: Optional[list]) -> pd
 
 
 def _load_all(eval_dir: str, vendors: Optional[list], years: Optional[list]) -> pd.DataFrame:
-    paths = glob.glob(os.path.join(eval_dir, "**", "*_eval.csv"), recursive=True)
+    paths = glob.glob(os.path.join(eval_dir, "**", "*.csv"), recursive=True)
     if not paths:
         return pd.DataFrame()
     frames = [_filter(pd.read_csv(p), vendors, years) for p in paths]
@@ -85,7 +85,7 @@ def _save(fig, output_path: str):
 
 @tool
 def plot_eval_latency(
-    eval_dir: str = "eval",
+    eval_dir: str = "eval_final",
     output_path: str = "eval_latency.png",
     vendors: Optional[list] = None,
     years: Optional[list] = None,
@@ -148,7 +148,7 @@ def plot_eval_latency(
 
 @tool
 def plot_eval_tokens(
-    eval_dir: str = "eval",
+    eval_dir: str = "eval_final",
     output_path: str = "eval_tokens.png",
     vendors: Optional[list] = None,
     years: Optional[list] = None,
@@ -212,7 +212,7 @@ def plot_eval_tokens(
 
 @tool
 def report_eval_accuracy(
-    eval_dir: str = "eval",
+    eval_dir: str = "eval_final",
     vendors: Optional[list] = None,
     years: Optional[list] = None,
 ) -> str:

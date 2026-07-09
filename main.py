@@ -22,13 +22,13 @@ def call_extraction_agent(request: str) -> str:
 
 @tool
 def call_analysis_agent(request: str) -> str:
-    """Send an analysis request to the Analysis Agent to generate MTTR, service category, or root cause charts."""
+    """Send an analysis request to the Analysis Agent to generate incident-level charts: MTTR/duration of incidents, service category distribution, or root cause distribution."""
     return analysis_agent.run(request)
 
 
 @tool
 def call_evaluation_agent(request: str) -> str:
-    """Send an evaluation request to the Evaluation Agent to display extraction accuracy results."""
+    """Send an evaluation request to the Evaluation Agent to display extraction accuracy, extraction latency/speed, or token usage/cost results."""
     return evaluation_agent.run(request)
 
 
@@ -36,8 +36,12 @@ REPORT_WORD_THRESHOLD = 100
 
 ORCHESTRATOR_PROMPT = (
     "You are an Incident Analysis Orchestrator. Route each user request to exactly one specialist agent:\n\n"
-    "1. call_analysis_agent  — if the request asks for charts or analysis: duration/MTTR, service category, or root cause\n"
-    "2. call_evaluation_agent — if the request mentions evaluation, accuracy, or eval results\n\n"
+    "1. call_analysis_agent  — charts/analysis about the INCIDENTS themselves: duration/MTTR of incidents, "
+    "service category distribution, or root cause distribution\n"
+    "2. call_evaluation_agent — anything about how well the EXTRACTION PIPELINE performed: accuracy, "
+    "extraction latency/speed (how long extraction took, not incident duration), or token usage/cost\n\n"
+    "'latency' and 'tokens' always mean call_evaluation_agent, never call_analysis_agent — "
+    "they measure the extraction process, not the incidents.\n\n"
     "Pass the user's full message to the chosen agent. Never call more than one agent per turn.\n\n"
     "After calling a specialist agent, relay its response to the user EXACTLY as returned — do not summarize, shorten, or paraphrase it."
 )
