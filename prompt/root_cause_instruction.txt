@@ -1,6 +1,11 @@
-CONFIG: incorrect system, hardware, software, or network configurations; 
-OVERLOAD: increasing traffic exceeding planned capacity, caused load imbalance; 
-DEPLOY: faulty deployment, update, or hardware/software bugs; 
-EXTERNAL: third-party service outage, power outages, or other external issues. 
-MAINTAIN: system maintenance causing unexpected issues; and 
-OTHERS: other types of root causes, such as human incorrect operations.
+CONFIG: the thing that was actually wrong is a configuration, setting, parameter, limit, or rule (e.g. wrong limits, bad routing config, a permission/config conflict). This is CONFIG regardless of how the bad configuration got there — manually applied, or pushed/deployed via a configuration push or deployment pipeline. The word "deployed" or "pushed" does NOT make it DEPLOY if what was deployed/pushed was itself a configuration value;
+OVERLOAD: increasing traffic or demand exceeded planned capacity, causing load imbalance, resource exhaustion, or the system/scaling could not keep up with demand;
+DEPLOY: the thing that was actually wrong is code/software logic (a software bug, defect, race condition) or a hardware component (a hardware fault/failure of a router, disk, network device, etc.) — NOT a configuration value. A standalone hardware fault is DEPLOY even when no deployment event is mentioned;
+EXTERNAL: a third-party service outage, power outage, or physical/environmental infrastructure failure (e.g. fiber cut, UPS/power failure) outside the provider's own software/hardware;
+MAINTAIN: a planned system maintenance activity that had unexpected side effects or did not complete successfully — this takes priority over CONFIG even if the maintenance resulted in a bad configuration;
+OTHERS: root causes that do not fit the above — most commonly a human/operator error (a person took an incorrect manual/one-off action) or a process/ownership mistake with no clear single technical trigger. A one-off human/operator mistake takes priority over CONFIG even if the mistake resulted in a bad configuration.
+
+Selection rules:
+- First check: was this explicitly a maintenance activity gone wrong (-> MAINTAIN), or an explicit one-off human/operator mistake (-> OTHERS)? These take priority over CONFIG even when the end result was a bad configuration.
+- Otherwise, classify by WHAT was actually wrong, not by how it was delivered: a bad configuration/setting/limit/rule is CONFIG (even if it was "deployed" or "pushed"); a code bug or hardware fault is DEPLOY (even with no deployment event mentioned).
+- Do not default to CONFIG just because the word "configuration" appears, and do not default to DEPLOY just because the word "deployed"/"pushed" appears — decide using the rules above.

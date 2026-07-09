@@ -1,0 +1,150 @@
+{
+  "evaluation_tool_selection": [
+    {
+      "input": "Show me the extraction accuracy results",
+      "expected_tool": "report_eval_accuracy"
+    },
+    {
+      "input": "What is the per-field accuracy for each vendor?",
+      "expected_tool": "report_eval_accuracy"
+    },
+    {
+      "input": "Give me a summary table of evaluation numbers",
+      "expected_tool": "report_eval_accuracy"
+    },
+    {
+      "input": "Compare accuracy across all providers",
+      "expected_tool": "report_eval_accuracy"
+    },
+    {
+      "input": "Show the extraction latency distribution",
+      "expected_tool": "plot_eval_latency"
+    },
+    {
+      "input": "How fast is extraction per report? Show the speed breakdown",
+      "expected_tool": "plot_eval_latency"
+    },
+    {
+      "input": "Plot the time per report for each vendor",
+      "expected_tool": "plot_eval_latency"
+    },
+    {
+      "input": "Show me the token usage per extraction",
+      "expected_tool": "plot_eval_tokens"
+    },
+    {
+      "input": "How many tokens does extraction cost on average?",
+      "expected_tool": "plot_eval_tokens"
+    },
+    {
+      "input": "Show me the cached vs total token breakdown across vendors",
+      "expected_tool": "plot_eval_tokens"
+    }
+  ],
+
+  "evaluation_params": [
+    {
+      "input": "Show accuracy results for Azure only",
+      "expected_tool": "report_eval_accuracy",
+      "expected_params": {"vendors": ["Azure"]}
+    },
+    {
+      "input": "Show the accuracy table for AWS and GCP",
+      "expected_tool": "report_eval_accuracy",
+      "expected_params": {"vendors": ["AWS", "GCP"]}
+    },
+    {
+      "input": "Show extraction accuracy for 2022 incidents",
+      "expected_tool": "report_eval_accuracy",
+      "expected_params": {"years": [2022]}
+    },
+    {
+      "input": "Show latency for Azure in 2023",
+      "expected_tool": "plot_eval_latency",
+      "expected_params": {"vendors": ["Azure"], "years": [2023]}
+    },
+    {
+      "input": "Plot token usage for GCP only",
+      "expected_tool": "plot_eval_tokens",
+      "expected_params": {"vendors": ["GCP"]}
+    },
+    {
+      "input": "Show extraction speed across all vendors",
+      "expected_tool": "plot_eval_latency",
+      "expected_params": {}
+    },
+    {
+      "input": "Show accuracy numbers for Azure in 2022 and 2023",
+      "expected_tool": "report_eval_accuracy",
+      "expected_params": {"vendors": ["Azure"], "years": [2022, 2023]}
+    },
+    {
+      "input": "Compare token costs for AWS and Azure",
+      "expected_tool": "plot_eval_tokens",
+      "expected_params": {"vendors": ["AWS", "Azure"]}
+    },
+    {
+      "input": "Show latency distribution for 2022 and 2023",
+      "expected_tool": "plot_eval_latency",
+      "expected_params": {"years": [2022, 2023]}
+    },
+    {
+      "input": "Show token usage for AWS in 2022",
+      "expected_tool": "plot_eval_tokens",
+      "expected_params": {"vendors": ["AWS"], "years": [2022]}
+    }
+  ],
+
+  "evaluation_boundary": [
+    {
+      "input": "Plot the cache hit ratio across vendors",
+      "expected_tool": "plot_eval_tokens",
+      "why": "cache → tokens, but 'ratio' could suggest accuracy"
+    },
+    {
+      "input": "How efficient is the extraction pipeline?",
+      "expected_tool": "plot_eval_latency",
+      "why": "efficiency is ambiguous — could mean speed, cost, or accuracy"
+    },
+    {
+      "input": "How well does the extractor perform?",
+      "expected_tool": "report_eval_accuracy",
+      "why": "performance could mean accuracy or speed"
+    },
+    {
+      "input": "Show me the evaluation results",
+      "expected_tool": "report_eval_accuracy",
+      "why": "generic 'results' — could be accuracy, latency, or tokens"
+    },
+    {
+      "input": "How costly is each extraction call?",
+      "expected_tool": "plot_eval_tokens",
+      "why": "cost could mean tokens or latency (time cost)"
+    },
+    {
+      "input": "What is the processing time and accuracy summary?",
+      "expected_tool": "report_eval_accuracy",
+      "why": "mentions both latency and accuracy — agent must pick one"
+    },
+    {
+      "input": "Show me the eval metrics",
+      "expected_tool": "report_eval_accuracy",
+      "why": "metrics is vague — could be any of the three tools"
+    },
+    {
+      "input": "How long does it take to process each report?",
+      "expected_tool": "plot_eval_latency",
+      "why": "time/duration phrasing without explicit latency keyword"
+    },
+    {
+      "input": "What are the evaluation scores?",
+      "expected_tool": "report_eval_accuracy",
+      "why": "scores could mean accuracy or any numeric result"
+    },
+    {
+      "input": "Is the model using the prompt cache effectively?",
+      "expected_tool": "plot_eval_tokens",
+      "why": "cache effectiveness could be interpreted as accuracy or tokens"
+    }
+  ]
+}

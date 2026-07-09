@@ -3,105 +3,180 @@ import numpy as np
 import pandas as pd
 import matplotlib
 matplotlib.use("Agg")
-
-import matplotlib.pyplot as plt
 import matplotlib.pyplot as plt
 import seaborn as sns
 import warnings
 import os
 import platform
- 
+from typing import Optional
+import time
+from tools.data_loader import load_filtered_df
+from tools.plot_logger import log_plot
+
 warnings.filterwarnings('ignore')
- 
-STORE_PATH = "cli_evaluation_log.csv"
- 
- 
+
+SQUARE = (6, 6)
+
+
 def _open_image(path: str):
     system = platform.system()
     if system == "Darwin":
-        os.system(f"open '{path}'")
+        os.system(f"open -g '{path}'")
     elif system == "Windows":
         os.startfile(path)
     else:
         os.system(f"xdg-open '{path}'")
- 
- 
-@tool
-def plot_time_duration(output_path: str = "duration.png") -> str:
-    """
-    Loads all saved incident records from the CSV store, plots a horizontal
-    log-scale MTTR boxplot, saves and opens the chart automatically.
- 
-    Args:
-        output_path: File path where the chart will be saved.
- 
-    Returns:
-        A message with the saved path and median MTTR.
-    """
- 
-    if not os.path.exists(STORE_PATH):
-        return "No data found. Please ingest a report first."
- 
-    df = pd.read_csv(STORE_PATH)
- 
-    if df.empty:
-        return "Store is empty. Please ingest a report first."
- 
-    # Handle UNKNOWN values
-    df['start_time'] = df['start_time'].replace('UNKNOWN', np.nan)
-    df['end_time'] = df['end_time'].replace('UNKNOWN', np.nan)
- 
-    # Parse datetime
-    df['start_time'] = pd.to_datetime(df['start_time'], errors='coerce')
-    df['end_time'] = pd.to_datetime(df['end_time'], errors='coerce')
- 
-    # Compute MTTR in hours
+
+
+def _compute_mttr(df: pd.DataFrame) -> pd.DataFrame:
+    df['end_time'] = pd.to_datetime(df['end_time'].replace('UNKNOWN', np.nan), errors='coerce', utc=True)
+    df['start_time'] = pd.to_datetime(df['start_time'].replace('UNKNOWN', np.nan), errors='coerce', utc=True)
     df['mttr'] = (df['end_time'] - df['start_time']) / np.timedelta64(1, 'h')
     df['mttr'] = pd.to_numeric(df['mttr'], errors='coerce')
- 
-    # Filter invalid and remove 3-sigma outliers
-    df = df[df['mttr'] > 0]
+    df = df[df['mttr'] > 0].copy()
     df = df[df['mttr'] < df['mttr'].mean() + 3 * df['mttr'].std()]
-    df['dataset'] = 'AZURE'
- 
+    return df
+
+
+@tool
+def plot_duration_box(
+    output_path: str = "duration_box.png",
+    vendors: Optional[list[str]] = None,
+    years: Optional[list[int]] = None,
+) -> str:
+    """
+    Plots a square log-scale MTTR boxplot showing the distribution of incident durations.
+    Optionally filter by vendors (e.g. ["AWS"]) and/or years (e.g. [2022, 2023]).
+    """
+    t0 = time.time()
+    try:
+        df = load_filtered_df(vendors=vendors, years=years)
+    except (FileNotFoundError, ValueError) as e:
+        return str(e)
+
+    df = _compute_mttr(df)
     if df.empty:
-        return "No valid MTTR data to plot after cleaning."
- 
-    # Plot
-    fig, ax = plt.subplots(1, 1, figsize=(8, 3))
- 
-    sns.boxplot(
-        data=df, x='mttr', y='dataset',
-        orient='h', width=0.6, palette='Set1', linecolor='black'
-    )
- 
-    ax.set_xlabel('MTTR [hours]', fontsize=18, fontweight='bold')
+        return "No valid MTTR data after cleaning."
+
+    label = "+".join(sorted(df['vendor'].unique())) if vendors else "ALL"
+    df['dataset'] = label
+
+    fig, ax = plt.subplots(figsize=SQUARE)
+    sns.boxplot(data=df, x='mttr', y='dataset', orient='h', width=0.4,
+                palette='Set1', linecolor='black', ax=ax)
+
+    ax.set_xlabel('MTTR [hours]', fontsize=13, fontweight='bold')
     ax.set_ylabel('')
-    ax.grid(axis='both', linestyle='--', alpha=0.6, which='both')
     ax.set_xscale('log')
     ax.set_xlim(0.1, 100)
-    ax.tick_params(axis='both', which='major', labelsize=18)
-    ax.tick_params(axis='both', which='minor', labelsize=16)
- 
-    for label in ax.get_xticklabels() + ax.get_yticklabels():
-        label.set_fontweight('bold')
- 
-    ref_lines = [(30/60, '0.5h'), (1, '1h'), (3, '3h'), (10, '10h'), (24, '24h')]
-    for x, label in ref_lines:
-        ax.axvline(x=x, color='black', linestyle='--', linewidth=1, alpha=0.7)
-        ax.text(x, -0.5, label, color='black', fontsize=18,
-                fontweight='bold', ha='center', va='top')
- 
+    ax.grid(axis='x', linestyle='--', alpha=0.5)
+    ax.tick_params(labelsize=11)
+    for lbl in ax.get_xticklabels() + ax.get_yticklabels():
+        lbl.set_fontweight('bold')
+    for x, lbl in [(0.5, '0.5h'), (1, '1h'), (3, '3h'), (10, '10h'), (24, '24h')]:
+        ax.axvline(x=x, color='gray', linestyle='--', linewidth=0.8, alpha=0.5)
+
     median = df['mttr'].median()
-    # Use numeric y-index (0) instead of string label for reliable positioning
-    ax.text(median, 0, f'{median:.2f}h',
-            color='black', fontsize=18, ha='center',
-            va='center', fontweight='bold')
- 
+    ax.set_title(f'MTTR Distribution  (median={median:.2f}h, n={len(df)})',
+                 fontsize=12, fontweight='bold', pad=8)
     plt.tight_layout()
     plt.savefig(output_path, dpi=150, bbox_inches='tight')
     plt.close()
- 
     _open_image(output_path)
- 
-    return f"Plot saved to '{output_path}'. Median MTTR: {median:.2f}h | Records plotted: {len(df)}"
+    log_plot("plot_duration_box", vendors, years, output_path, len(df), time.time() - t0)
+    return f"Plot saved to '{output_path}'. Median MTTR: {median:.2f}h | n={len(df)}"
+
+
+@tool
+def plot_duration_bar(
+    output_path: str = "duration_bar.png",
+    vendors: Optional[list[str]] = None,
+    years: Optional[list[int]] = None,
+) -> str:
+    """
+    Plots a square bar chart of mean MTTR per year.
+    Optionally filter by vendors (e.g. ["Azure"]) and/or years (e.g. [2022, 2023]).
+    """
+    t0 = time.time()
+    try:
+        df = load_filtered_df(vendors=vendors, years=years)
+    except (FileNotFoundError, ValueError) as e:
+        return str(e)
+
+    df = _compute_mttr(df)
+    if df.empty:
+        return "No valid MTTR data after cleaning."
+
+    df['year'] = df['start_time'].dt.year
+    yearly = df.groupby('year')['mttr'].mean().sort_index()
+
+    fig, ax = plt.subplots(figsize=SQUARE)
+    bars = ax.bar(yearly.index.astype(str), yearly.values,
+                  color='#4C72B0', edgecolor='black', width=0.5)
+    for bar, val in zip(bars, yearly.values):
+        ax.text(bar.get_x() + bar.get_width() / 2, bar.get_height() + yearly.max() * 0.02,
+                f'{val:.2f}h', ha='center', va='bottom', fontsize=11, fontweight='bold')
+
+    ax.set_xlabel('Year', fontsize=13, fontweight='bold')
+    ax.set_ylabel('Mean MTTR [hours]', fontsize=13, fontweight='bold')
+    ax.set_title('Mean MTTR per Year', fontsize=12, fontweight='bold', pad=8)
+    ax.grid(axis='y', linestyle='--', alpha=0.4)
+    ax.tick_params(labelsize=11)
+    for lbl in ax.get_xticklabels() + ax.get_yticklabels():
+        lbl.set_fontweight('bold')
+
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150, bbox_inches='tight')
+    plt.close()
+    _open_image(output_path)
+    log_plot("plot_duration_bar", vendors, years, output_path, len(df), time.time() - t0)
+    return f"Plot saved to '{output_path}'. Mean MTTR by year: " + \
+           ", ".join(f"{y}={v:.2f}h" for y, v in yearly.items())
+
+
+@tool
+def plot_duration_line(
+    output_path: str = "duration_line.png",
+    vendors: Optional[list[str]] = None,
+    years: Optional[list[int]] = None,
+) -> str:
+    """
+    Plots a square line chart of monthly mean MTTR trend over time.
+    Optionally filter by vendors (e.g. ["GCP"]) and/or years (e.g. [2023]).
+    """
+    t0 = time.time()
+    try:
+        df = load_filtered_df(vendors=vendors, years=years)
+    except (FileNotFoundError, ValueError) as e:
+        return str(e)
+
+    df = _compute_mttr(df)
+    if df.empty:
+        return "No valid MTTR data after cleaning."
+
+    df['month'] = df['start_time'].dt.to_period('M')
+    monthly = df.groupby('month')['mttr'].mean().sort_index()
+    x = np.arange(len(monthly))
+    labels = [str(p) for p in monthly.index]
+
+    fig, ax = plt.subplots(figsize=SQUARE)
+    ax.plot(x, monthly.values, marker='o', color='#C44E52', linewidth=2, markersize=5)
+    ax.fill_between(x, monthly.values, alpha=0.15, color='#C44E52')
+
+    step = max(1, len(x) // 6)
+    ax.set_xticks(x[::step])
+    ax.set_xticklabels(labels[::step], rotation=30, ha='right', fontsize=10)
+    ax.set_xlabel('Month', fontsize=13, fontweight='bold')
+    ax.set_ylabel('Mean MTTR [hours]', fontsize=13, fontweight='bold')
+    ax.set_title('Monthly MTTR Trend', fontsize=12, fontweight='bold', pad=8)
+    ax.grid(linestyle='--', alpha=0.4)
+    ax.tick_params(axis='y', labelsize=11)
+    for lbl in ax.get_yticklabels():
+        lbl.set_fontweight('bold')
+
+    plt.tight_layout()
+    plt.savefig(output_path, dpi=150, bbox_inches='tight')
+    plt.close()
+    _open_image(output_path)
+    log_plot("plot_duration_line", vendors, years, output_path, len(df), time.time() - t0)
+    return f"Plot saved to '{output_path}'. Trend plotted over {len(monthly)} months."

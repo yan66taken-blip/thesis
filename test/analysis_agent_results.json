@@ -1,0 +1,578 @@
+{
+  "tool_selection": {
+    "accuracy": 1.0,
+    "n": 20,
+    "details": [
+      {
+        "input": "Show me a pie chart of root cause distribution",
+        "expected": "plot_rootcause_pie",
+        "predicted": "plot_rootcause_pie",
+        "match": true
+      },
+      {
+        "input": "Plot a horizontal bar chart of root cause categories",
+        "expected": "plot_rootcause_bar",
+        "predicted": "plot_rootcause_bar",
+        "match": true
+      },
+      {
+        "input": "Compare root cause distribution across vendors with a stacked bar chart",
+        "expected": "plot_rootcause_stacked",
+        "predicted": "plot_rootcause_stacked",
+        "match": true
+      },
+      {
+        "input": "Show the service category breakdown as a pie chart",
+        "expected": "plot_servicecategory_pie",
+        "predicted": "plot_servicecategory_pie",
+        "match": true
+      },
+      {
+        "input": "Plot service category percentages as a bar chart",
+        "expected": "plot_servicecategory_bar",
+        "predicted": "plot_servicecategory_bar",
+        "match": true
+      },
+      {
+        "input": "Show a stacked chart comparing service categories by vendor",
+        "expected": "plot_servicecategory_stacked",
+        "predicted": "plot_servicecategory_stacked",
+        "match": true
+      },
+      {
+        "input": "Show me the MTTR distribution as a boxplot",
+        "expected": "plot_duration_box",
+        "predicted": "plot_duration_box",
+        "match": true
+      },
+      {
+        "input": "Plot mean MTTR per year as a bar chart",
+        "expected": "plot_duration_bar",
+        "predicted": "plot_duration_bar",
+        "match": true
+      },
+      {
+        "input": "Show the monthly MTTR trend over time",
+        "expected": "plot_duration_line",
+        "predicted": "plot_duration_line",
+        "match": true
+      },
+      {
+        "input": "What does the incident duration distribution look like?",
+        "expected": "plot_duration_box",
+        "predicted": "plot_duration_box",
+        "match": true
+      },
+      {
+        "input": "Show the root cause pie chart for all incidents",
+        "expected": "plot_rootcause_pie",
+        "predicted": "plot_rootcause_pie",
+        "match": true
+      },
+      {
+        "input": "Give me a line chart of how duration changes over time",
+        "expected": "plot_duration_line",
+        "predicted": "plot_duration_line",
+        "match": true
+      },
+      {
+        "input": "Plot the service distribution using a stacked bar",
+        "expected": "plot_servicecategory_stacked",
+        "predicted": "plot_servicecategory_stacked",
+        "match": true
+      },
+      {
+        "input": "Show a bar chart of how long incidents last each year",
+        "expected": "plot_duration_bar",
+        "predicted": "plot_duration_bar",
+        "match": true
+      },
+      {
+        "input": "What are the main causes of incidents? Show me a pie chart",
+        "expected": "plot_rootcause_pie",
+        "predicted": "plot_rootcause_pie",
+        "match": true
+      },
+      {
+        "input": "Show the root cause category bar chart",
+        "expected": "plot_rootcause_bar",
+        "predicted": "plot_rootcause_bar",
+        "match": true
+      },
+      {
+        "input": "Plot root cause stacked bar across cloud providers",
+        "expected": "plot_rootcause_stacked",
+        "predicted": "plot_rootcause_stacked",
+        "match": true
+      },
+      {
+        "input": "Show service category distribution in a pie chart",
+        "expected": "plot_servicecategory_pie",
+        "predicted": "plot_servicecategory_pie",
+        "match": true
+      },
+      {
+        "input": "Plot incident duration as a box plot",
+        "expected": "plot_duration_box",
+        "predicted": "plot_duration_box",
+        "match": true
+      },
+      {
+        "input": "Show the MTTR trend line over the past months",
+        "expected": "plot_duration_line",
+        "predicted": "plot_duration_line",
+        "match": true
+      }
+    ]
+  },
+  "params": {
+    "accuracy": 1.0,
+    "n": 20,
+    "details": [
+      {
+        "input": "Show root cause distribution pie chart for Azure",
+        "expected_tool": "plot_rootcause_pie",
+        "expected_params": {
+          "vendors": [
+            "Azure"
+          ]
+        },
+        "predicted_tool": "plot_rootcause_pie",
+        "predicted_params": {
+          "vendors": [
+            "Azure"
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Plot the service category bar chart for AWS and GCP",
+        "expected_tool": "plot_servicecategory_bar",
+        "expected_params": {
+          "vendors": [
+            "AWS",
+            "GCP"
+          ]
+        },
+        "predicted_tool": "plot_servicecategory_bar",
+        "predicted_params": {
+          "vendors": [
+            "AWS",
+            "GCP"
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Show the MTTR boxplot for 2023 incidents",
+        "expected_tool": "plot_duration_box",
+        "expected_params": {
+          "years": [
+            2023
+          ]
+        },
+        "predicted_tool": "plot_duration_box",
+        "predicted_params": {
+          "years": [
+            2023
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Plot duration trend for Azure in 2022",
+        "expected_tool": "plot_duration_line",
+        "expected_params": {
+          "vendors": [
+            "Azure"
+          ],
+          "years": [
+            2022
+          ]
+        },
+        "predicted_tool": "plot_duration_line",
+        "predicted_params": {
+          "vendors": [
+            "Azure"
+          ],
+          "years": [
+            2022
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Compare root cause stacked bar for AWS and Azure in 2022 and 2023",
+        "expected_tool": "plot_rootcause_stacked",
+        "expected_params": {
+          "vendors": [
+            "AWS",
+            "Azure"
+          ],
+          "years": [
+            2022,
+            2023
+          ]
+        },
+        "predicted_tool": "plot_rootcause_stacked",
+        "predicted_params": {
+          "vendors": [
+            "AWS",
+            "Azure"
+          ],
+          "years": [
+            2022,
+            2023
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Show root cause bar chart for all vendors",
+        "expected_tool": "plot_rootcause_bar",
+        "expected_params": {},
+        "predicted_tool": "plot_rootcause_bar",
+        "predicted_params": {},
+        "match": true
+      },
+      {
+        "input": "Plot service category pie chart for GCP only",
+        "expected_tool": "plot_servicecategory_pie",
+        "expected_params": {
+          "vendors": [
+            "GCP"
+          ]
+        },
+        "predicted_tool": "plot_servicecategory_pie",
+        "predicted_params": {
+          "vendors": [
+            "GCP"
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Show the duration bar chart for 2022 and 2023",
+        "expected_tool": "plot_duration_bar",
+        "expected_params": {
+          "years": [
+            2022,
+            2023
+          ]
+        },
+        "predicted_tool": "plot_duration_bar",
+        "predicted_params": {
+          "years": [
+            2022,
+            2023
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Compare service categories across vendors for 2023",
+        "expected_tool": "plot_servicecategory_stacked",
+        "expected_params": {
+          "vendors": null,
+          "years": [
+            2023
+          ]
+        },
+        "predicted_tool": "plot_servicecategory_stacked",
+        "predicted_params": {
+          "years": [
+            2023
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Show MTTR line trend for AWS in 2022 and 2023",
+        "expected_tool": "plot_duration_line",
+        "expected_params": {
+          "vendors": [
+            "AWS"
+          ],
+          "years": [
+            2022,
+            2023
+          ]
+        },
+        "predicted_tool": "plot_duration_line",
+        "predicted_params": {
+          "vendors": [
+            "AWS"
+          ],
+          "years": [
+            2022,
+            2023
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Plot root cause pie chart for Azure and GCP in 2023",
+        "expected_tool": "plot_rootcause_pie",
+        "expected_params": {
+          "vendors": [
+            "Azure",
+            "GCP"
+          ],
+          "years": [
+            2023
+          ]
+        },
+        "predicted_tool": "plot_rootcause_pie",
+        "predicted_params": {
+          "vendors": [
+            "Azure",
+            "GCP"
+          ],
+          "years": [
+            2023
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Show duration boxplot for AWS",
+        "expected_tool": "plot_duration_box",
+        "expected_params": {
+          "vendors": [
+            "AWS"
+          ]
+        },
+        "predicted_tool": "plot_duration_box",
+        "predicted_params": {
+          "vendors": [
+            "AWS"
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Show root cause bar chart for GCP in 2022",
+        "expected_tool": "plot_rootcause_bar",
+        "expected_params": {
+          "vendors": [
+            "GCP"
+          ],
+          "years": [
+            2022
+          ]
+        },
+        "predicted_tool": "plot_rootcause_bar",
+        "predicted_params": {
+          "vendors": [
+            "GCP"
+          ],
+          "years": [
+            2022
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Plot service category stacked bar for AWS and Azure",
+        "expected_tool": "plot_servicecategory_stacked",
+        "expected_params": {
+          "vendors": [
+            "AWS",
+            "Azure"
+          ]
+        },
+        "predicted_tool": "plot_servicecategory_stacked",
+        "predicted_params": {
+          "vendors": [
+            "AWS",
+            "Azure"
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Show the MTTR bar chart for Azure in 2023",
+        "expected_tool": "plot_duration_bar",
+        "expected_params": {
+          "vendors": [
+            "Azure"
+          ],
+          "years": [
+            2023
+          ]
+        },
+        "predicted_tool": "plot_duration_bar",
+        "predicted_params": {
+          "vendors": [
+            "Azure"
+          ],
+          "years": [
+            2023
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Show service category bar chart for all providers in 2022 and 2023",
+        "expected_tool": "plot_servicecategory_bar",
+        "expected_params": {
+          "years": [
+            2022,
+            2023
+          ]
+        },
+        "predicted_tool": "plot_servicecategory_bar",
+        "predicted_params": {
+          "years": [
+            2022,
+            2023
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Plot the root cause pie for AWS only",
+        "expected_tool": "plot_rootcause_pie",
+        "expected_params": {
+          "vendors": [
+            "AWS"
+          ]
+        },
+        "predicted_tool": "plot_rootcause_pie",
+        "predicted_params": {
+          "vendors": [
+            "AWS"
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Show duration box plot for GCP in 2023",
+        "expected_tool": "plot_duration_box",
+        "expected_params": {
+          "vendors": [
+            "GCP"
+          ],
+          "years": [
+            2023
+          ]
+        },
+        "predicted_tool": "plot_duration_box",
+        "predicted_params": {
+          "vendors": [
+            "GCP"
+          ],
+          "years": [
+            2023
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Plot service category pie chart for Azure in 2022",
+        "expected_tool": "plot_servicecategory_pie",
+        "expected_params": {
+          "vendors": [
+            "Azure"
+          ],
+          "years": [
+            2022
+          ]
+        },
+        "predicted_tool": "plot_servicecategory_pie",
+        "predicted_params": {
+          "vendors": [
+            "Azure"
+          ],
+          "years": [
+            2022
+          ]
+        },
+        "match": true
+      },
+      {
+        "input": "Show the MTTR trend line for all vendors in 2023",
+        "expected_tool": "plot_duration_line",
+        "expected_params": {
+          "years": [
+            2023
+          ]
+        },
+        "predicted_tool": "plot_duration_line",
+        "predicted_params": {
+          "vendors": null,
+          "years": [
+            2023
+          ]
+        },
+        "match": true
+      }
+    ]
+  },
+  "boundary": {
+    "accuracy": 0.9,
+    "n": 10,
+    "details": [
+      {
+        "input": "What are the incident causes?",
+        "expected": "plot_rootcause_pie",
+        "predicted": "plot_rootcause_pie",
+        "match": true
+      },
+      {
+        "input": "How long do incidents take to resolve?",
+        "expected": "plot_duration_box",
+        "predicted": "none",
+        "match": false
+      },
+      {
+        "input": "Which services are most affected?",
+        "expected": "plot_servicecategory_bar",
+        "predicted": "plot_servicecategory_bar",
+        "match": true
+      },
+      {
+        "input": "Show me a breakdown of causes by vendor",
+        "expected": "plot_rootcause_stacked",
+        "predicted": "plot_rootcause_stacked",
+        "match": true
+      },
+      {
+        "input": "How has resolution time changed over the months?",
+        "expected": "plot_duration_line",
+        "predicted": "plot_duration_line",
+        "match": true
+      },
+      {
+        "input": "Compare the service impact across all cloud providers",
+        "expected": "plot_servicecategory_stacked",
+        "predicted": "plot_servicecategory_stacked",
+        "match": true
+      },
+      {
+        "input": "Show me the average time to fix incidents each year",
+        "expected": "plot_duration_bar",
+        "predicted": "plot_duration_bar",
+        "match": true
+      },
+      {
+        "input": "What is the proportion of each root cause?",
+        "expected": "plot_rootcause_pie",
+        "predicted": "plot_rootcause_pie",
+        "match": true
+      },
+      {
+        "input": "Show me how service categories differ between AWS and Azure",
+        "expected": "plot_servicecategory_stacked",
+        "predicted": "plot_servicecategory_stacked",
+        "match": true
+      },
+      {
+        "input": "Give me a quick overview of incident durations",
+        "expected": "plot_duration_bar",
+        "predicted": "plot_duration_bar",
+        "match": true
+      }
+    ]
+  }
+}

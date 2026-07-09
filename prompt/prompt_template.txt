@@ -1,12 +1,78 @@
-You are an expert in categorizing cloud incidents. Given an incident report, extract the following information:
+You are an expert in categorizing cloud infrastructure incidents reported by major cloud providers (Azure, AWS, GCP). Analyze the incident report step by step to extract structured information. Follow the reasoning steps:
 
-- vendor: the cloud provider
-- service_name: name of the affected service
-- service_category: choose from {service_category_lst}
-- start_time / end_time: timestamps in UTC
-- user_symptom: sentence(s) describing what users experienced
-- user_symptom_category: from {user_symp_lst}, one or more that match. {user_symp_instruction}
-- root_cause: sentence(s) describing what caused the incident
-- root_cause_category: from {root_cause_lst}, the single best match. {root_cause_instruction}
+1. Identify the vendor (Azure, AWS, or GCP) and the specific service name affected. Use the official product name as it appears in the report.
 
-Use "UNKNOWN" if a field is not clear.
+2. From {service_category_lst}, select one most relevant service category.
+   - COMPUTE: virtual machines, containers, serverless functions, batch processing
+   - STORAGE: object storage, file storage, disk storage, backup services
+   - NETWORK: load balancers, CDN, DNS, VPN, peering, connectivity services
+   - SECURITY: identity, authentication, key management, certificates, WAF
+   - AI: machine learning, AI/LLM APIs, cognitive services, vision, speech
+   - MANAGEMENT: monitoring, logging, alerting, deployment, orchestration tools
+   - ANALYTICS: data warehouses, streaming pipelines, BI tools, data processing
+   - DATABASE: relational databases, NoSQL, caching, in-memory stores
+   - OTHERS: services that do not clearly fit the above categories
+   - UNKNOWN: service category cannot be determined from the report
+
+3. Extract the relevant sentence(s) directly from the report that describe user-visible symptoms. Then, from {user_symp_lst}, select one or more categories that best match.
+   The definition for user_symptom_category: {user_symp_instruction}
+   - Be conservative: only label what is explicitly stated. Prefer a single label unless the report clearly describes two distinct symptom types.
+
+4. Extract the relevant sentence(s) directly from the report that explain the root cause. Then, from {root_cause_lst}, select exactly one category that best matches.
+   The definition for root_cause_category: {root_cause_instruction}
+   - Distinguish DEPLOY (bad rollout or software bug) from CONFIG (pre-existing or manually applied misconfiguration).
+   - Distinguish OVERLOAD (demand exceeded capacity) from MAINTAIN (planned maintenance with unexpected side effects).
+   - If a third-party dependency caused the issue, use EXTERNAL.
+
+5. Identify the start time and end time in the format YYYYMMDDThh:mm:ss (e.g., 20230412T14:00:00). Use the time exactly as stated in the report — do not convert to UTC. If only a date is given, append T00:00:00. If only a time is given without a date, use the format hh:mm (e.g., 14:00). Use "UNKNOWN" if neither date nor time can be determined.
+   - For AWS timeline-style reports: each paragraph begins with a timestamp of when that update was posted — ignore these post timestamps. The actual incident window appears as a "Between X and Y" sentence inside the final resolved update. Use those X and Y values as start_time and end_time.
+   - If no "Between X and Y" sentence exists but the first update timestamp marks the beginning of the incident, use that as start_time and the last update timestamp as end_time.
+   - For GCP reports: start_time is stated as "beginning at <time>" and end_time as "resolved ... as of <time>" inside the text fields.
+
+Finally, return the extracted information in a JSON object with the keys:
+vendor, service_name, service_category, start_time, end_time, user_symptom, user_symptom_category, root_cause, root_cause_category.
+
+Use "UNKNOWN" for any field that cannot be determined. Do not copy boilerplate apology or survey language into symptom or root cause fields.
+
+Here are examples of an incident report (labeled Q) and the correct extracted information (labeled A).
+
+Q:
+description:
+What happened?
+Between 09:50 UTC and 17:21 UTC on 07 Sep 2022, a subset of customers using Azure Cosmos DB in North Europe may have experienced issues accessing services. Connections to Cosmos DB accounts in this region may have resulted in an error or timeout. Downstream Azure services that rely on Cosmos DB also experienced impact during this window.
+What went wrong and why?
+Cosmos DB load balances workloads across its infrastructure, within frontend and backend clusters. Our frontend load balancing procedure had a regression that did not factor in the effect of a reduction in available cluster capacity, due to ongoing maintenance. This surfaced during an ongoing platform maintenance event in one of the frontend clusters in the North Europe region, causing the availability issues described above.
+How did we respond?
+Our monitors alerted us of the impact on this cluster. We mitigated by load balancing off the impacted cluster by moving customer accounts to healthy clusters within the region.
+A:
+{{"vendor": "Azure", "service_name": "Azure Cosmos DB", "service_category": "DATABASE", "start_time": "20220907T09:50:00", "end_time": "20220907T17:21:00", "user_symptom": "Connections to Cosmos DB accounts in this region may have resulted in an error or timeout.", "user_symptom_category": "ERROR,DELAY", "root_cause": "Our frontend load balancing procedure had a regression that did not factor in the effect of a reduction in available cluster capacity, due to ongoing maintenance.", "root_cause_category": "MAINTAIN"}}
+
+Q:
+description:
+<div><span class="yellowfg">11:55 AM PST</span>&nbsp;We can confirm increased delays for CloudWatch log event processing for metric filter extraction and log subscriptions in the EU-WEST-1 Region.</div><div><span class="yellowfg">12:49 PM PST</span>&nbsp;We have isolated the likely root cause to a subsystem that saw an unexpected jump in resource consumption. We continue to work towards resolution.</div><div><span class="yellowfg"> 1:52 PM PST</span>&nbsp;We have implemented a fix and are starting to see signs of recovery.</div><div><span class="yellowfg"> 2:56 PM PST</span>&nbsp;Between 10:26 AM and 02:40 PM PST, we experienced increased delays for CloudWatch log event processing for metric filter extraction and log subscriptions in the EU-WEST-1 Region. This was due to a subsystem that saw an unexpected jump in resource consumption. The issue has been resolved and the service is operating normally.</div>
+A:
+{{"vendor": "AWS", "service_name": "Amazon CloudWatch", "service_category": "MANAGEMENT", "start_time": "10:26", "end_time": "14:40", "user_symptom": "we experienced increased delays for CloudWatch log event processing for metric filter extraction and log subscriptions in the EU-WEST-1 Region.", "user_symptom_category": "DELAY", "root_cause": "a subsystem that saw an unexpected jump in resource consumption.", "root_cause_category": "OVERLOAD"}}
+
+Q:
+description:
+What happened?
+Between 14:00 UTC and 15:30 UTC on 03 Mar 2023, a subset of customers in the West US region may have experienced connection failures when accessing services hosted in the region.
+What went wrong and why?
+The incident was caused by a configuration error pushed to routers in the West US region, which resulted in dropped network packets and connection failures for affected customers.
+How did we respond?
+Engineers identified the faulty configuration and rolled it back, restoring normal connectivity.
+A:
+{{"vendor": "Azure", "service_name": "Azure Networking", "service_category": "NETWORK", "start_time": "20230303T14:00:00", "end_time": "20230303T15:30:00", "user_symptom": "a subset of customers in the West US region may have experienced connection failures when accessing services hosted in the region.", "user_symptom_category": "UNAVIL", "root_cause": "a configuration error pushed to routers in the West US region, which resulted in dropped network packets and connection failures for affected customers.", "root_cause_category": "CONFIG"}}
+
+Q:
+description:
+What happened?
+Between 02:00 UTC and 03:15 UTC on 11 Jun 2023, customers may have experienced intermittent connectivity issues to services hosted in the East Asia region.
+What went wrong and why?
+Engineers determined that a network device in the East Asia region experienced a hardware fault, and traffic was not automatically rerouted to healthy devices, causing the connectivity issues described above.
+How did we respond?
+Engineers manually rerouted traffic away from the faulty device, which restored normal connectivity.
+A:
+{{"vendor": "Azure", "service_name": "Azure Networking", "service_category": "NETWORK", "start_time": "20230611T02:00:00", "end_time": "20230611T03:15:00", "user_symptom": "customers may have experienced intermittent connectivity issues to services hosted in the East Asia region.", "user_symptom_category": "UNAVIL", "root_cause": "a network device in the East Asia region experienced a hardware fault, and traffic was not automatically rerouted to healthy devices.", "root_cause_category": "DEPLOY"}}
+
+Now, analyze the following incident report and return the extracted JSON.

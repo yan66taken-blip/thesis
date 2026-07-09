@@ -1,5 +1,12 @@
-ERROR: users receive errors of failures when using the service; 
-UNAVIL: users encounter availability or connectivity issues when accessing the service; 
-DELAY: users experience delays, latency, or timeout issues; 
-DEPERF: degraded performance of the service; 
-OTHERS: other issues, such as failure to perform specific operations.
+ERROR: users receive an explicit application-level failure for a request/operation that did reach the service (e.g. HTTP 4xx/5xx responses, failed API calls, failed database operations, authentication failures, incorrect/error results returned to the user);
+UNAVIL: users cannot establish or complete a connection to the service at all — described as connection failures, connection timeouts, connectivity failures, "unable to access/reach", or "connection refused". Use UNAVIL for this even if the report itself uses the word "error", "failure", or "timeout" to describe the connection-level problem — the deciding factor is whether the connection itself succeeded, not the wording used;
+DELAY: users experience increased latency, slowness, or processing delays, but the service remains accessible;
+DEPERF: the service is accessible and functional but with reduced throughput, capacity, or quality (e.g. reduced success rate, partial feature degradation) — distinct from UNAVIL (service is still reachable) and DELAY (not primarily a latency issue);
+OTHERS: any user-visible symptom that clearly does not fit the above four categories (e.g. incorrect results, data inconsistency, missing data).
+
+Selection rules:
+- Only select a category if it is clearly and explicitly described in the report. Do not infer or assume.
+- If the report describes users being unable to connect/reach the service (connection failures, connectivity issues, timeouts on connection attempts, "connection refused"), use UNAVIL — do not use ERROR just because the report's own wording includes "error" or "failure" for what is really a connectivity problem.
+- Use ERROR only when a request did reach the service and the service then returned an explicit failure/error response (e.g. a 500 error on a completed request, a failed write, an authentication error).
+- Prefer fewer labels: only add a second category if distinctly evidenced. Do not add UNAVIL just because errors occurred, or add ERROR just because the service was unavailable.
+- Use OTHERS only when the symptom genuinely does not fit ERROR, UNAVIL, DELAY, or DEPERF.
