@@ -15,7 +15,7 @@ A top-level orchestrator routes each user message to exactly one specialist agen
 | Agent | File | Tools |
 |---|---|---|
 | **ExtractionAgent** | [agents/extraction_agent.py](agents/extraction_agent.py) | `extractor`, `smart_extractor` — parse an incident report and persist structured fields |
-| **AnalysisAgent** | [agents/analysis_agent.py](agents/analysis_agent.py) | `plot_rootcause`,`plot_servicecategory`,`plot_duration` |
+| **AnalysisAgent** | [agents/analysis_agent.py](agents/analysis_agent.py) | `plot_rootcause`,`plot_servicecategory`,`plot_duration` - plot the dirtribution of root cause, service category and duration|
 | **EvaluationAgent** | [agents/evaluation_agent.py](agents/evaluation_agent.py) | `report_eval_accuracy`, `plot_eval_latency`, `plot_eval_tokens` — how well the extraction pipeline itself performs |
 
 Two entry points expose the orchestrator:
